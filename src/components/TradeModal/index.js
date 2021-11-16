@@ -4,7 +4,7 @@ import { TradeModalDisplay } from "./styles/TradeModalDisplay"
 import { postTrade } from '../../services/tradeApi';
 
 function TradeModal({closeModal, user, partner, pokemonList, partnerPokemonList, socket}) {
-  const getTotalExp = (array) => {
+  const getTotalExp = (array = []) => {
     const total = array.reduce((acc,cur) => {
       acc = acc + cur.base_experience
       return acc;
@@ -27,8 +27,8 @@ function TradeModal({closeModal, user, partner, pokemonList, partnerPokemonList,
     const response = {
       user, 
       partner, 
-      userPokemonList: pokemonList.map(({name, base_experience}) =>({name, base_experience})), 
-      partnerPokemonList: partnerPokemonList.map(({name, base_experience}) => ({name, base_experience})),
+      userPokemonList: pokemonList ? pokemonList.map(({name, base_experience}) =>({name, base_experience})) : [], 
+      partnerPokemonList: partnerPokemonList ? partnerPokemonList.map(({name, base_experience}) => ({name, base_experience})) :[],
       isValid: isValid()
     }
     const postResponse = await postTrade(response)
@@ -36,7 +36,7 @@ function TradeModal({closeModal, user, partner, pokemonList, partnerPokemonList,
   },[])
 
   const close = () => {
-    socket.emit('readyTrade',{ready: false}, 'trade')
+    socket.emit('readyTrade',{ready: false, roomid: 123}, 'trade')
     closeModal()
   }
 
@@ -50,13 +50,13 @@ function TradeModal({closeModal, user, partner, pokemonList, partnerPokemonList,
         <div className="user-receipt">
             <h4>{user}</h4>
             <p className="total">{`Total base experience: ${getTotalExp(pokemonList)} exp`}</p>
-            {pokemonList.map(({name, base_experience}) => 
+            {pokemonList && pokemonList.map(({name, base_experience}) => 
             (<p key={base_experience + name}>{`${name}: ${base_experience} exp`}</p>))}
         </div>
         <div className="partner-receipt">
             <h4>{partner}</h4>
             <p className="total">{`Total base experience: ${getTotalExp(partnerPokemonList)} exp`}</p>
-            {partnerPokemonList.map(({name, base_experience}) => 
+            {partnerPokemonList && partnerPokemonList.map(({name, base_experience}) => 
             (<p key={base_experience + name}>{`${name}: ${base_experience} exp`}</p>))}
         </div>
       </div>

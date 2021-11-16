@@ -1,31 +1,40 @@
-import React, {useState, useEffect}from 'react';
+/* eslint-disable no-unused-vars */
+import React, {useState, useEffect,useCallback,useMemo}from 'react';
 import io from 'socket.io-client';
 import ItemCard from '../components/ItemCard';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/Header';
 import TradeModal from '../components/TradeModal';
-import { fetchPokemonByName } from '../services/pokemonApi';
 import { MainPageDisplay } from './styles/MainPageDisplay';
 import ConfirmButtons from '../components/ConfirmButtons';
 
 function MainPage() {
-    const [user ,setUser] = useState('');
-    const [partner ,setPartner] = useState('');
-    const [pokemonList ,setPokemonList] = useState([]);
-    const [partnerPokemonList ,setPartnerPokemonList] = useState([]);
+    const [user ,setUser] = useState();
+    const [partner ,setPartner] = useState();
+    const [pokemonList ,setPokemonList] = useState();
+    const [partnerPokemonList ,setPartnerPokemonList] = useState();
     const [showModal, setShowModal] = useState(false);
     // eslint-disable-next-line no-undef
-    const socket = io.connect(process.env.REACT_APP_API_URL);
-    socket.on('user', (username) => {
-        if (user !== username) {
-            setPartner(username)
-        }
-    });
-    socket.on('partnerPokemon', ({updatedList, username}) => {
-        if (username !== user) {
-            setPartnerPokemonList(updatedList)
-        }
-    });
+    const socket = useMemo(()=>{ return io.connect(process.env.REACT_APP_API_URL)},[]);
+    const roomid = 123;
+
+
+    const handlerAddUser = (user)=>
+    {
+        socket.emit('join', ({roomid,user}));
+        setUser(user)
+    }
+    const handlerAddPokemonToList = (pokemon) => {
+        const updatedList = pokemonList ? [...pokemonList, pokemon] : [pokemon]
+        setPokemonList(updatedList)
+        socket.emit("updateList",{roomid,updatedList})
+    }
+    socket.on("new_user",({user})=>{
+        setPartner(user)
+    }) 
+    socket.on("updateList",(({updatedList})=>{
+        setPartnerPokemonList(updatedList)
+    }));
 
     socket.on('readyTrade', (ready) => {
         if (ready) {
@@ -40,15 +49,6 @@ function MainPage() {
         }
       }, []);
 
-    const searchPokemon = async (query) => {
-        const result = await fetchPokemonByName(query)
-        if (result.error) return alert('Invalid request to PokemonAPI, please make a proper request with a pokemon name. e.g. sandshrew')
-        if (pokemonList.length < 6) {
-            const updatedList = [...pokemonList, result];
-            setPokemonList(updatedList)   
-            socket.emit('userPokemon',updatedList, user); 
-        }
-    };
     const closeModal = () => {
         setPartner('');
         setUser('');
@@ -59,22 +59,22 @@ function MainPage() {
     const removePokemon = (pokemonInfo) => {
         const updatedList = pokemonList.filter((pokemon) => pokemon !== pokemonInfo);
         setPokemonList(updatedList)   
-        socket.emit('userPokemon',updatedList, user); 
+        socket.emit("updateList",{roomid,updatedList})
     }
     const readyTrade = (boolean) => {
         setShowModal(boolean);
-        socket.emit('readyTrade',{ready: boolean})
+        socket.emit('readyTrade',{ready: boolean, roomid})
     }
 
 
     return (
         <MainPageDisplay>
-            <Header user={user} setUser={setUser} socket={socket} partner={partner}/>
+            <Header user={user} setUser={handlerAddUser} partner={partner}/>
             <section className="trade-station">
                 <div className="user">
-                    <SearchBar searchPokemon={searchPokemon}/>
+                    <SearchBar  onSubmit={handlerAddPokemonToList} pokemonList={pokemonList} />
                     <section className="card-list">
-                        {pokemonList.map((item) => <ItemCard info={item} key={item.id + new Date()}  removePokemon={removePokemon}/>)}
+                        {pokemonList && pokemonList.map((item) => <ItemCard info={item} key={item.id + new Date()}  removePokemon={removePokemon}/>)}
                     </section>
                 </div>
                 <div className="partner">
@@ -82,7 +82,7 @@ function MainPage() {
                         {`Wait for your partner to add some Pokemon`}
                     </p>
                     <section className="card-list">
-                        {partnerPokemonList.map((item) => <ItemCard info={item} key={item.id} removePokemon={removePokemon}/>)}
+                        {partnerPokemonList && partnerPokemonList.map((item) => <ItemCard info={item} key={item.id+ new Date()} removePokemon={removePokemon}/>)}
                     </section>
                 </div>
             </section>
@@ -95,10 +95,10 @@ function MainPage() {
                     partner={partner}
                     pokemonList={pokemonList}
                     partnerPokemonList={partnerPokemonList}
-                    setUser={setUser}
-                    setPokemonList={setPokemonList}
-                    setPartner={setPartner}
-                    setPartnerPokemonList={setPartnerPokemonList} 
+                    // setUser={setUser}
+                    // setPokemonList={setPokemonList}
+                    // setPartner={setPartner}
+                    // setPartnerPokemonList={setPartnerPokemonList} 
                     // setTradeInfo={setUser, setPokemonList, setPartnerPokemonList, setPartner}
                     socket={socket}
                 />

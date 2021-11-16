@@ -1,32 +1,27 @@
-import React, {useState} from "react";
+import React, {useRef,useCallback} from "react";
 import PropTypes from 'prop-types';
 import { HeaderDisplay } from "./styles/HeaderDisplay";
 
-function Header ({user, partner, setUser, socket}) {
-  const [usernameOk, setUsernameOk] = useState(false);
-  const handleChange = ({target}) => {
-    setUser(target.value)
-  }
-  const sendUsername =() => {
-    setUsernameOk(true);
-    socket.emit('user', {user: user}, 'trade')
-  }
+function Header ({user, setUser,partner }) {
+  const inputRef = useRef()
+  const handlerSendUserName = useCallback(() => {
+    setUser(inputRef.current.value);
+  },[])
   return (
     <HeaderDisplay>
       <span className="header-section">
-        {!usernameOk?   
+        {!user ? 
           <div className="username-form">     
             <label >
             Username:
               <input
                 placeholder="ex:red96"
-                value={user}
                 type="text"
                 name="user"
-                onChange={handleChange}
+                ref={inputRef}
               />
             </label>
-            <button className="add-btn" onClick={sendUsername}>
+            <button className="add-btn" onClick={handlerSendUserName}>
               Ok
             </button>
         </div>
