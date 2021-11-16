@@ -22,9 +22,7 @@ function MainPage() {
         }
     });
     socket.on('partnerPokemon', ({updatedList, username}) => {
-        console.log('username',username, user)
         if (username !== user) {
-            console.log('entrou',username, user)
             setPartnerPokemonList(updatedList)
         }
     });
