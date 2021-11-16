@@ -1,7 +1,7 @@
 
 export const postTrade = async (tradeInfo) => {
   // eslint-disable-next-line no-undef
-  const url = `${process.env.REACT_APP_API_URL}/trade/`;
+  const url = `${process.env.REACT_APP_API_URL}trade/`;
   try {
     const result = await fetch(url, {
       method: 'POST', 
