@@ -14,7 +14,6 @@ height: 100vh;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  /* margin-top: 2vw; */
 }
 .user {
   display: flex;

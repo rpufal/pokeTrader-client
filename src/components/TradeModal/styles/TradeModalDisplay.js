@@ -3,18 +3,13 @@ import styled from 'styled-components';
 export const TradeModalDisplay = styled.div`
 width: 50vw;
 min-width: 35vw;
-/* background-color: #2B4162; */
 background-color: #2B4162;
 color: #EBEBEB;
-/* background-color: #B9CFD4; */
-/* padding-top: 0.8%; */
 padding-bottom: 1.5%;
 margin-bottom: 2rem;
 
 .up {
-  /* margin-left: 5%;
-  margin-right: 5%;
-  margin-bottom: 2%; */
+
   width: 100%;
   display: flex;
   justify-content: space-evenly;
@@ -28,7 +23,6 @@ margin-bottom: 2rem;
 
 .close:hover {
   transform: rotate(90deg);
-  /* color: black; */
 }
 
 .middle {
@@ -41,8 +35,11 @@ margin-bottom: 2rem;
   align-items:center;
 }
 
+.total {
+  font-weight: bold;
+}
+
 .low {
-  /* margin-left: 5%; */
   width: 100%;
   display: flex;
   flex-direction: row;

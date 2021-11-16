@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import { TradeModalDisplay } from "./styles/TradeModalDisplay"
 import { postTrade } from '../../services/tradeApi';
 
-function TradeModal({setShowModal, tradeInfo, setTradeInfo, socket}) {
-  const {user, partner, pokemonList, partnerPokemonList} = tradeInfo;
-
+function TradeModal({closeModal, user, partner, pokemonList, partnerPokemonList, socket}) {
   const getTotalExp = (array) => {
     const total = array.reduce((acc,cur) => {
       acc = acc + cur.base_experience
@@ -17,22 +15,12 @@ function TradeModal({setShowModal, tradeInfo, setTradeInfo, socket}) {
   const partnerTotal = getTotalExp(partnerPokemonList);
   const isValid = () => {
     if (userTotal === 0|| partnerTotal === 0 ) return false;
-    const validRatio = (userTotal + partnerTotal) * 0.05;
+    const tradeIndex = 0.09
+    const validRatio = (userTotal + partnerTotal) * tradeIndex;
     if ( Math.abs(userTotal - partnerTotal) <= validRatio) {
       return true;
     }
     return false;
-  }
-
-  const closeModal = () => {
-    setTradeInfo({
-      user, 
-      partner, 
-      pokemonList: [],
-      partnerPokemonList: []
-     })
-    socket.emit('readyTrade',{ready: false}, 'trade')
-    setShowModal(false);
   }
 
   useEffect(async () => {
@@ -47,24 +35,29 @@ function TradeModal({setShowModal, tradeInfo, setTradeInfo, socket}) {
     if (postResponse.error) alert(postResponse.error);
   },[])
 
+  const close = () => {
+    socket.emit('readyTrade',{ready: false}, 'trade')
+    closeModal()
+  }
+
   return (
     <TradeModalDisplay>
       <div className="up">
         <h2>Trade Log</h2>
-        <a onClick={closeModal} ><h1 className="close">+</h1></a>
+        <a onClick={close} ><h1 className="close">+</h1></a>
       </div>
       <div className="middle">
         <div className="user-receipt">
             <h4>{user}</h4>
+            <p className="total">{`Total base experience: ${getTotalExp(pokemonList)} exp`}</p>
             {pokemonList.map(({name, base_experience}) => 
             (<p key={base_experience + name}>{`${name}: ${base_experience} exp`}</p>))}
-            <p>{`Total base experience: ${getTotalExp(pokemonList)} exp`}</p>
         </div>
         <div className="partner-receipt">
             <h4>{partner}</h4>
+            <p className="total">{`Total base experience: ${getTotalExp(partnerPokemonList)} exp`}</p>
             {partnerPokemonList.map(({name, base_experience}) => 
             (<p key={base_experience + name}>{`${name}: ${base_experience} exp`}</p>))}
-            <p>{`Total base experience: ${getTotalExp(partnerPokemonList)} exp`}</p>
         </div>
       </div>
       <div className="low">
@@ -75,9 +68,11 @@ function TradeModal({setShowModal, tradeInfo, setTradeInfo, socket}) {
 }
 
 TradeModal.propTypes = {
-  setShowModal: PropTypes.func,
-  setTradeInfo: PropTypes.func,
-  tradeInfo: PropTypes.object,
+  closeModal: PropTypes.func,
+  pokemonList: PropTypes.array,
+  partnerPokemonList: PropTypes.array,
+  user: PropTypes.string,
+  partner: PropTypes.string,
   socket: PropTypes.object
 };
 

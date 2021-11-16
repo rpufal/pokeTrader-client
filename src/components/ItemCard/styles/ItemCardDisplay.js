@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 
 export const ItemCardDisplay = styled.div`
-/* #fire {
-  background-color: red;
-}; */
 * {
   margin: 0.15rem;
 }
@@ -22,7 +19,6 @@ background-color: #B9CFD4;
 
 .header{
   display:flex;
-  /* align-self: flex-start; */
   justify-content: space-between;
   align-items: baseline;
   flex-direction: row;
@@ -52,7 +48,6 @@ background-color: #B9CFD4;
   font-size: 0.6rem;
   display: flex;
   flex-direction: row;
-  /* align-self: center; */
   justify-content: space-evenly;
 }
 .exp {

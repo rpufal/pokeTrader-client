@@ -14,7 +14,6 @@ left: 0;
 
 .header-section {
   width: 18rem;
-  /* width: 33%auto; */
 }
 
 .logo {
@@ -25,9 +24,7 @@ left: 0;
   display: flex;
   flex-direction: row;
   align-self: center;
-  /* justify-content: space-evenly; */
   align-items: center;
-  /* width: 25rem; */
 }
 
 
@@ -36,8 +33,6 @@ left: 0;
 }
 
 .username-form input {
-  /* margin-left: 0.3rem; */
-  /* margin-right: 0.2rem; */
   border: 0.5px solid #EBEBEB;
   background-color: #142338;
   color: #EBEBEB;
@@ -48,8 +43,6 @@ left: 0;
 .add-btn {
   padding: 0.2rem;
   background-color: #FF6700;
-  /* padding-left: 0.4rem; */
-  /* padding-right: 0.4rem; */
   color: #EBEBEB;
   border: none;
   border-radius: 0.1rem;

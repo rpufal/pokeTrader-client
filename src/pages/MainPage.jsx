@@ -9,28 +9,33 @@ import { MainPageDisplay } from './styles/MainPageDisplay';
 import ConfirmButtons from '../components/ConfirmButtons';
 
 function MainPage() {
-    const [tradeInfo, setTradeInfo] = useState({
-        user: '', 
-        partner: '', 
-        pokemonList: [],
-        partnerPokemonList: []
-        });
+    const [user ,setUser] = useState('');
+    const [partner ,setPartner] = useState('');
+    const [pokemonList ,setPokemonList] = useState([]);
+    const [partnerPokemonList ,setPartnerPokemonList] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    
-    const socket = io.connect('http://localhost:3001');
-    const room = 'trade'
-    socket.emit('join-room', room)
-    socket.on('user', (user) => {
-        if (tradeInfo.partner === '') {
-            setTradeInfo({...tradeInfo, partner: user})
+    // eslint-disable-next-line no-undef
+    const socket = io.connect(process.env.REACT_APP_API_URL);
+    socket.on('user', (username) => {
+        if (user !== username) {
+            setPartner(username)
         }
     });
-    socket.on('partnerPokemon', (updatedList) => {
-        console.log(updatedList)
-        setTradeInfo({...tradeInfo, partnerPokemonList: updatedList})
+    socket.on('partnerPokemon', ({updatedList, username}) => {
+        console.log('username',username, user)
+        if (username !== user) {
+            console.log('entrou',username, user)
+            setPartnerPokemonList(updatedList)
+        }
     });
 
-    socket.on('readyTrade', (ready) => setShowModal(ready));
+    socket.on('readyTrade', (ready) => {
+        if (ready) {
+            setShowModal(ready)
+            return;
+        }
+        closeModal();
+    });
     useEffect(() => {
         return () => {
             socket.disconnect()
@@ -40,32 +45,38 @@ function MainPage() {
     const searchPokemon = async (query) => {
         const result = await fetchPokemonByName(query)
         if (result.error) return alert('Invalid request to PokemonAPI, please make a proper request with a pokemon name. e.g. sandshrew')
-        if (tradeInfo.pokemonList.length < 6) {
-            const updatedList = [...tradeInfo.pokemonList, result];
-            setTradeInfo({...tradeInfo, pokemonList: updatedList})   
-            socket.emit('userPokemon',updatedList,room); 
+        if (pokemonList.length < 6) {
+            const updatedList = [...pokemonList, result];
+            setPokemonList(updatedList)   
+            socket.emit('userPokemon',updatedList, user); 
         }
     };
-
+    const closeModal = () => {
+        setPartner('');
+        setUser('');
+        setPokemonList([]);
+        setPartnerPokemonList([]);
+        setShowModal(false);
+    }
     const removePokemon = (pokemonInfo) => {
-        const updatedList = tradeInfo.pokemonList.filter((pokemon) => pokemon !== pokemonInfo);
-        setTradeInfo({...tradeInfo, pokemonList: updatedList})   
-        socket.emit('userPokemon',updatedList,room); 
+        const updatedList = pokemonList.filter((pokemon) => pokemon !== pokemonInfo);
+        setPokemonList(updatedList)   
+        socket.emit('userPokemon',updatedList, user); 
     }
     const readyTrade = (boolean) => {
         setShowModal(boolean);
-        socket.emit('readyTrade',{ready: boolean}, room)
+        socket.emit('readyTrade',{ready: boolean})
     }
 
 
     return (
         <MainPageDisplay>
-            <Header tradeInfo={tradeInfo} setTradeInfo={setTradeInfo} socket={socket}/>
+            <Header user={user} setUser={setUser} socket={socket} partner={partner}/>
             <section className="trade-station">
                 <div className="user">
                     <SearchBar searchPokemon={searchPokemon}/>
                     <section className="card-list">
-                        {tradeInfo.pokemonList.map((item) => <ItemCard info={item} key={item.id + new Date()}  removePokemon={removePokemon}/>)}
+                        {pokemonList.map((item) => <ItemCard info={item} key={item.id + new Date()}  removePokemon={removePokemon}/>)}
                     </section>
                 </div>
                 <div className="partner">
@@ -73,17 +84,24 @@ function MainPage() {
                         {`Wait for your partner to add some Pokemon`}
                     </p>
                     <section className="card-list">
-                        {tradeInfo.partnerPokemonList.map((item) => <ItemCard info={item} key={item.id} removePokemon={removePokemon}/>)}
+                        {partnerPokemonList.map((item) => <ItemCard info={item} key={item.id} removePokemon={removePokemon}/>)}
                     </section>
                 </div>
             </section>
-            <ConfirmButtons readyTrade={readyTrade} tradeInfo={tradeInfo}/>
+            <ConfirmButtons readyTrade={readyTrade}/>
             {showModal &&
             <div className={`modal-background ${showModal}`}>
                 <TradeModal 
-                    setShowModal={setShowModal} 
-                    tradeInfo={tradeInfo} 
-                    setTradeInfo={setTradeInfo}
+                    closeModal={closeModal} 
+                    user={user}
+                    partner={partner}
+                    pokemonList={pokemonList}
+                    partnerPokemonList={partnerPokemonList}
+                    setUser={setUser}
+                    setPokemonList={setPokemonList}
+                    setPartner={setPartner}
+                    setPartnerPokemonList={setPartnerPokemonList} 
+                    // setTradeInfo={setUser, setPokemonList, setPartnerPokemonList, setPartner}
                     socket={socket}
                 />
             </div>}

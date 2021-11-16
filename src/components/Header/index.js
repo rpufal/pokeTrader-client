@@ -2,27 +2,28 @@ import React, {useState} from "react";
 import PropTypes from 'prop-types';
 import { HeaderDisplay } from "./styles/HeaderDisplay";
 
-function Header ({tradeInfo, setTradeInfo, socket}) {
+function Header ({user, partner, setUser, socket}) {
   const [usernameOk, setUsernameOk] = useState(false);
-  // const {user, partner} = tradeInfo;
-  const sendUsername = () => {
-    setTradeInfo({...tradeInfo, user: tradeInfo.user})
+  const handleChange = ({target}) => {
+    setUser(target.value)
+  }
+  const sendUsername =() => {
     setUsernameOk(true);
-    socket.emit('user', {user: tradeInfo.user}, 'trade')
+    socket.emit('user', {user: user}, 'trade')
   }
   return (
     <HeaderDisplay>
       <span className="header-section">
-        {!usernameOk ?   
+        {!usernameOk?   
           <div className="username-form">     
-            <label>
+            <label >
             Username:
               <input
                 placeholder="ex:red96"
-                value={tradeInfo.user}
+                value={user}
                 type="text"
                 name="user"
-                onChange={({target}) => setTradeInfo({...tradeInfo, user: target.value})}
+                onChange={handleChange}
               />
             </label>
             <button className="add-btn" onClick={sendUsername}>
@@ -30,20 +31,21 @@ function Header ({tradeInfo, setTradeInfo, socket}) {
             </button>
         </div>
         :
-        <p className='user-status'>{`${tradeInfo.user} ON`}</p>
+        <p className='user-status'>{`${user} ON`}</p>
         }
       </span>
       <p className="logo">PokeTRADER</p>
       <span className="header-section">
-        <p className='partner-status'>{tradeInfo.partner ? `${tradeInfo.partner} ON` : `...waiting`}</p>
+        <p className='partner-status'>{partner ? `${partner} ON` : `...waiting`}</p>
       </span>
     </HeaderDisplay>
   );
 }
 
 Header.propTypes = {
-  tradeInfo: PropTypes.object,
-  setTradeInfo: PropTypes.func,
+  user: PropTypes.string,
+  setUser: PropTypes.func,
+  partner: PropTypes.string,
   socket: PropTypes.object
 };
 
