@@ -7,7 +7,7 @@ function SearchBar ({searchPokemon}) {
   const [filter, setFilter] = useState({name:''});
   return (
     <SearchBarDisplay>
-      <label>
+      <label className='searchbar'>
         Add a Pokemon to the Trade:
         <input
           placeholder="ex:Charizard"

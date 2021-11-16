@@ -7,11 +7,11 @@ justify-content: space-evenly;
 align-items: center;
 width: 25rem;
 
-label {
+.searchbar {
   color: #EBEBEB;
 }
 
-input {
+.searchbar input {
   margin-left: 0.3rem;
   margin-right: 0.2rem;
   border: 0.5px solid #EBEBEB;
