@@ -12,9 +12,14 @@ As etapas de log in e adição/remoção de pokemon serão refletidas no cliente
 
 <img src="images/tradeConfirmed.png" width="500px">
 
+Para utilização completa das funcionalidades duas guias do projeto devem ser abertas para averiguar a troca sendo feita.
+
 A aplicação teve o deploy feito na plataforma Heroku e o link é o seguinte:
+
 https://poke-trader-client.herokuapp.com/
+
 Observação:
+
 É possível que haja certa demora para a resposta do servidor pois o Heroku costuma hibernar a aplicação após determinado período de tempo. Basta esperar um pouco!
 
 ## Teste local
