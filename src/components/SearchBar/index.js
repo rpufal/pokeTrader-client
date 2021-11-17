@@ -13,7 +13,7 @@ function SearchBar ({onSubmit,pokemonList}) {
   },[onSubmit,pokemon])
   const searchPokemon = async () => {
     if(pokemonList?.length + 1 > 6)  return alert("Você ja tem muitos pokemon em sua lista");
-    const result = await fetchPokemonByName(inputRef.current.value)
+    const result = await fetchPokemonByName(inputRef.current.value.toLowerCase())
 
     if (result.error) return alert('Invalid request to PokemonAPI, please make a proper request with a pokemon name. e.g. sandshrew')
     alert(`Pokemon Encontrado ${result.name}`)
